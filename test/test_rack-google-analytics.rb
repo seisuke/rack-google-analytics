@@ -44,6 +44,23 @@ class TestRackGoogleAnalytics < Test::Unit::TestCase
       end
     end
 
+    context "except" do
+      setup { mock_app :async => true, :tracker => 'somebody', :except => /^\/admin/ }
+      should "not add tracker to except url" do     
+        get "/admin/index"
+        assert_no_match %r{\_gaq\.push}, last_response.body
+      end
+
+      should "show asyncronous tracker" do
+        get "/"
+        assert_match %r{\_gaq\.push}, last_response.body
+      end
+
+      should "not add tracker to none html content-type" do
+        get "/test.xml"
+        assert_no_match %r{\_gaq\.push}, last_response.body
+      end
+    end
   end
   
   context "Syncronous" do

@@ -1,4 +1,5 @@
 require 'rack'
+require 'pry'
 require 'erb'
 
 module Rack
@@ -16,7 +17,7 @@ module Rack
 
     def _call(env)
       @status, @headers, @response = @app.call(env)
-      return [@status, @headers, @response] unless html?
+      return [@status, @headers, @response] unless html? && !except?(env)
       response = Rack::Response.new([], @status, @headers)
       @response.each { |fragment| response.write inject(fragment) }
       response.finish
@@ -25,7 +26,12 @@ module Rack
     private
 
     def html?; @headers['Content-Type'] =~ /html/; end
-
+    
+    def except?(env)      
+      return false unless except = @options[:except]        
+      return env["PATH_INFO"] =~ except
+    end
+    
     def inject(response)
       file = @options[:async] ? 'async' : 'sync'
       @template ||= ::ERB.new ::File.read ::File.expand_path("../templates/#{file}.erb",__FILE__)

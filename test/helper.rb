@@ -15,6 +15,7 @@ class Test::Unit::TestCase
       request = Rack::Request.new(env)
       case request.path
       when '/' then [200,{ 'Content-Type' => 'application/html' },['<head>Hello world</head>']]
+      when '/admin/index' then [200,{ 'Content-Type' => 'application/html' },['<head>Hello world</head>']]
       when '/test.xml' then [200,{'Content-Type' => 'application/xml'}, ['Xml here']]
       when '/bob' then [200,{'Content-Type' => 'application/html'} ,['<body>bob here</body>']]
       else [404,'Nothing here']
